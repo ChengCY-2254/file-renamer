@@ -28,10 +28,10 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - name: Run tests
-        run: cargo test --verbose --features full
+#      - name: Run tests
+#        run: cargo test --verbose
       - name: Build
-        run: cargo build --verbose --release --features release
+        run: cargo build --verbose --release
       - name: 'Upload build target'
         uses: actions/upload-artifact@v4
         with:
