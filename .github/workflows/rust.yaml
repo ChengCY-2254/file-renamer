@@ -1,0 +1,43 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # see https://github.com/actions/runner-images
+        os: [macos-latest,windows-latest,ubuntu-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: use cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Run tests
+        run: cargo test --verbose --features full
+      - name: Build
+        run: cargo build --verbose --release --features release
+      - name: 'Upload build target'
+        uses: actions/upload-artifact@v4
+        with:
+          name: file-renamer-${{ runner.os }}
+          path: |
+            ./target/release/file-renamer*
+            !./target/release/shuba.pdb
+            !./target/release/shuba.d
+          retention-days: 30
