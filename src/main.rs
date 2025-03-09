@@ -39,8 +39,9 @@ impl AppConfig {
     fn from_args() -> Self {
         let matches = clap::Command::new("uuid-renamer")
             .version("1.0")
-            .author("Your Name")
-            .about("批量重命名文件为UUID格式，只对文件进行重命名，不会修改目录名")
+            .long_version(build_info::GIT_HASH_7)
+            .author("Cheng")
+            .about("批量重命名文件为UUID格式，只对文件进行重命名，不会修改目录名。")
             .arg(
                 clap::Arg::new("path")
                     .help("目标路径")
