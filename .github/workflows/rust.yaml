@@ -2,9 +2,9 @@ name: Rust
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master" , "main" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master" , "main" ]
 
 env:
   CARGO_TERM_COLOR: always
@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         # see https://github.com/actions/runner-images
-        os: [macos-latest,windows-latest,ubuntu-latest]
+        os: [ macos-latest,windows-latest,ubuntu-latest ]
 
     steps:
       - uses: actions/checkout@v4
