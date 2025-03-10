@@ -32,6 +32,8 @@ struct AppConfig {
     target_path: PathBuf,
     ///是否递归
     recursive: bool,
+    /// 是否处理隐藏文件
+    hidden: bool,
 }
 
 impl AppConfig {
@@ -56,11 +58,19 @@ impl AppConfig {
                     .help("递归处理子目录")
                     .action(SetTrue),
             )
+            .arg(
+                clap::Arg::new("hidden")
+                    .short('h')
+                    .long("hidden")
+                    .help("处理隐藏文件")
+                    .action(SetTrue),
+            )
             .get_matches();
 
         AppConfig {
             target_path: PathBuf::from(matches.get_one::<String>("path").unwrap()),
             recursive: matches.get_flag("recursive"),
+            hidden: matches.get_flag("hidden"),
         }
     }
 }
@@ -77,14 +87,18 @@ impl FileRenamer {
         }
 
         if path.is_file() {
-            Self::rename_file(path)?
+            Self::rename_file(path, config.hidden)?
         } else {
-            Self::process_directory(path, config.recursive)?
+            Self::process_directory(path, config.recursive, config.hidden)?
         }
         Ok(())
     }
     /// 对文件进行重命名
-    fn rename_file(path: &Path) -> Result<(), RenameError> {
+    fn rename_file(path: &Path, hidden: bool) -> Result<(), RenameError> {
+        if !hidden && path.file_name().unwrap().to_str().unwrap().starts_with('.') {
+            println!("跳过隐藏文件:{:?}", path);
+            return Ok(());
+        }
         let new_name = Self::generate_new_name(path)?;
         let parent = path.parent().ok_or(RenameError::NoParentDirectory)?;
         let new_path = parent.join(new_name);
@@ -94,7 +108,7 @@ impl FileRenamer {
         Ok(())
     }
     /// 对目录进行处理
-    fn process_directory(dir: &Path, recursive: bool) -> Result<(), RenameError> {
+    fn process_directory(dir: &Path, recursive: bool, hidden: bool) -> Result<(), RenameError> {
         // 检查目录是否存在
         for entry in dir.read_dir()? {
             let entry = entry?;
@@ -102,7 +116,7 @@ impl FileRenamer {
             if path.is_dir() {
                 //如果是一个目录，看看是否需要递归处理内容
                 if recursive {
-                    Self::process_directory(&path, recursive)?;
+                    Self::process_directory(&path, recursive, hidden)?;
                 }
             } else if path.is_file() {
                 // 是一个文件就直接处理
@@ -113,7 +127,7 @@ impl FileRenamer {
                         continue;
                     }
                 }
-                Self::rename_file(&path)?;
+                Self::rename_file(&path, hidden)?;
             }
         }
         Ok(())
