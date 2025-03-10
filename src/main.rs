@@ -106,6 +106,13 @@ impl FileRenamer {
                 }
             } else if path.is_file() {
                 // 是一个文件就直接处理
+                // 需要添加排除列表，例如macOS的.DS_Store文件，艹。
+                #[cfg(target_os = "macos")]
+                {
+                    if path.file_name().unwrap() == ".DS_Store" {
+                        continue;
+                    }
+                }
                 Self::rename_file(&path)?;
             }
         }

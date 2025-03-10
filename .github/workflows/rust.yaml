@@ -38,6 +38,6 @@ jobs:
           name: file-renamer-${{ runner.os }}
           path: |
             ./target/release/file-renamer*
-            !./target/release/shuba.pdb
-            !./target/release/shuba.d
+            !./target/release/file-renamer.pdb
+            !./target/release/file-renamer.d
           retention-days: 30
