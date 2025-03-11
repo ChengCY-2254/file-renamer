@@ -13,7 +13,7 @@ fn main() -> Result<(), RenameError> {
 }
 
 #[derive(Debug)]
-enum RenameError {
+pub enum RenameError {
     #[allow(unused)]
     Io(std::io::Error),
     InvalidPath,
@@ -27,7 +27,7 @@ impl From<std::io::Error> for RenameError {
 }
 
 ///命令行参数解析结果
-struct AppConfig {
+pub struct AppConfig {
     ///目标路径
     target_path: PathBuf,
     ///是否递归
@@ -38,7 +38,7 @@ struct AppConfig {
 
 impl AppConfig {
     /// 从命令行参数初始化配置
-    fn from_args() -> Self {
+    pub fn from_args() -> Self {
         let matches = clap::Command::new("uuid-renamer")
             .version("1.0")
             .long_version(build_info::GIT_HASH_7)
@@ -143,6 +143,7 @@ impl FileRenamer {
         Ok(format!("{}.{}", Self::format_uuid(), extension))
     }
     /// 生成uuid
+    #[inline]
     fn format_uuid() -> String {
         Uuid::new_v4().simple().to_string().to_uppercase()
     }
